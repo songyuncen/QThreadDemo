@@ -8,13 +8,14 @@ class Monitor : public QObject {
   Monitor();
   ~Monitor();
 
+  int Quit();
  public slots:
   void GatherAndAnalyze();
-  void Quit();
 
  signals:
   void SendAction(int no);
 
  private:
   QThread *thread_;
+  int index_;
 };

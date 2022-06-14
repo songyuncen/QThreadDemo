@@ -1,7 +1,7 @@
 #include "executor.h"
 
-#include <QThread>
 #include <QDebug>
+#include <QThread>
 
 Executor::Executor() : thread_(nullptr) {
   thread_ = new QThread;
@@ -12,19 +12,28 @@ Executor::Executor() : thread_(nullptr) {
 }
 
 Executor::~Executor() {
-  qDebug() <<(quintptr)QThread::currentThreadId() << " : "
+  qDebug() << (quintptr)QThread::currentThreadId() << " : "
            << "Deconstruction of Executor";
   thread_->deleteLater();
 }
 
-void Executor::DoAction(int no) { 
+void Executor::DoAction(int no) {
+  QThread::sleep(2);
   qDebug() << (quintptr)QThread::currentThreadId() << " : "
            << "DoAction(" << no << ")";
+  if (index_ > 0) {
+    if (no >= index_) {
+      emit NeedQuit();
+    }
+  }
 }
 
-void Executor::Quit() {
-  qDebug() <<(quintptr)QThread::currentThreadId() << " : "
-           << "Quit Executor";
-  thread_->quit();
+void Executor::Quit(int index) {
+  qDebug() << (quintptr)QThread::currentThreadId() << " : "
+           << "Quit Executor with " << index;
+  if (index < 0) {
+    thread_->quit();
+  } else {
+    index_ = index;
+  }
 }
-

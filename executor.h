@@ -1,6 +1,6 @@
 #pragma once
 #include <QObject>
-
+#include <QAtomicInt>
 class QThread;
 
 class Executor : public QObject {
@@ -11,8 +11,12 @@ class Executor : public QObject {
 
  public slots:
   void DoAction(int no);
-  void Quit();
+  void Quit(int index = -1);
+
+signals:
+  void NeedQuit();
 
  private:
   QThread *thread_;
+  QAtomicInt index_;
 };

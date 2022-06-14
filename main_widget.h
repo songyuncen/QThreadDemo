@@ -14,7 +14,7 @@ class MainWidget : public QWidget {
 
  public slots:
   void Start(bool checked);
-  void Quit();
+  void Quit(bool immediate = true);
 
  private:
   void SetupUI();

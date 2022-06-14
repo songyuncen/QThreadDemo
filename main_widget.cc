@@ -33,25 +33,34 @@ void MainWidget::Start(bool checked) {
     monitor_ = new Monitor;
     executor_ = new Executor;
     connect(monitor_, SIGNAL(SendAction(int)), executor_, SLOT(DoAction(int)));
+    connect(executor_, SIGNAL(NeedQuit()), this, SLOT(Quit()));
   } else {
     qDebug() << (quintptr)QThread::currentThreadId() << " : "
              << "Stop in MainWidget";
     start_button_->setText(tr("Start"));
-    Quit();
+    Quit(false);
   }
 }
 
-void MainWidget::Quit() {
+void MainWidget::Quit(bool immediate) {
+  // first quit monitor
+  int index = -1;
   if (monitor_) {
-    monitor_->Quit();
+    index = monitor_->Quit();
     monitor_ = nullptr;
   }
 
   if (executor_) {
-    executor_->Quit();
-    executor_ = nullptr;
+    if (immediate) {
+      executor_->Quit(-1);
+      executor_ = nullptr;
+    } else {
+      executor_->Quit(index);
+    }
   }
-
   qDebug() << (quintptr)QThread::currentThreadId() << " : "
            << "Quit in MainWidget";
+
+  start_button_->setChecked(false);
+  start_button_->setText(tr("Start"));
 }

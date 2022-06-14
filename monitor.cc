@@ -5,6 +5,7 @@
 #include <QTimer>
 
 Monitor::Monitor() {
+  index_ = 0;
   thread_ = new QThread;
   QTimer *timer = new QTimer;
   timer->setSingleShot(false);
@@ -29,15 +30,15 @@ Monitor::~Monitor() {
 }
 
 void Monitor::GatherAndAnalyze() {
-  static int index = 0;
-  emit SendAction(index);
+  emit SendAction(index_);
   qDebug() << (quintptr)QThread::currentThreadId() << " : "
-           << "GatherAndAnalyze " << index;
-  index++;
+           << "GatherAndAnalyze " << index_;
+  index_++;
 }
 
-void Monitor::Quit() {
+int Monitor::Quit() {
   qDebug() << (quintptr)QThread::currentThreadId() << " : "
            << "Quit Monitor";
   thread_->quit();
+  return index_ - 1;
 }
