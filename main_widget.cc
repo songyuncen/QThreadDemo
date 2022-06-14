@@ -2,7 +2,10 @@
 
 #include <QtWidgets>
 
-MainWidget::MainWidget() {
+#include "executor.h"
+#include "monitor.h"
+
+MainWidget::MainWidget() : monitor_(nullptr), executor_(nullptr) {
   SetupUI();
   connect(start_button_, SIGNAL(clicked(bool)), this, SLOT(Start(bool)));
 }
@@ -24,13 +27,31 @@ void MainWidget::SetupUI() {
 
 void MainWidget::Start(bool checked) {
   if (checked) {
-    qDebug() << "Start";
+    qDebug() << (quintptr)QThread::currentThreadId() << " : "
+             << "Start in MainWidget";
     start_button_->setText(tr("Stop"));
+    monitor_ = new Monitor;
+    executor_ = new Executor;
+    connect(monitor_, SIGNAL(SendAction(int)), executor_, SLOT(DoAction(int)));
   } else {
-    qDebug() << "Stop";
+    qDebug() << (quintptr)QThread::currentThreadId() << " : "
+             << "Stop in MainWidget";
     start_button_->setText(tr("Start"));
+    Quit();
   }
 }
 
-void MainWidget::Quit() { qDebug() << "Quit"; }
+void MainWidget::Quit() {
+  if (monitor_) {
+    monitor_->Quit();
+    monitor_ = nullptr;
+  }
 
+  if (executor_) {
+    executor_->Quit();
+    executor_ = nullptr;
+  }
+
+  qDebug() << (quintptr)QThread::currentThreadId() << " : "
+           << "Quit in MainWidget";
+}

@@ -3,6 +3,8 @@
 #include <QWidget>
 
 class QPushButton;
+class Monitor;
+class Executor;
 
 class MainWidget : public QWidget {
   Q_OBJECT
@@ -18,4 +20,6 @@ class MainWidget : public QWidget {
   void SetupUI();
 
   QPushButton *start_button_;
+  Monitor *monitor_;
+  Executor *executor_;
 };
